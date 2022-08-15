@@ -70,6 +70,7 @@ const createServer = async (container) => {
     },
   ]);
 
+  // say hello world endpoint
   server.route({
     method: 'GET',
     path: '/',
