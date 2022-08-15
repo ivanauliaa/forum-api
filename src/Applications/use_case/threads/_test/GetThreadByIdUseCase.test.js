@@ -1,6 +1,7 @@
 const ThreadRepository = require('../../../../Domains/threads/ThreadRepository');
 const CommentRepository = require('../../../../Domains/comments/CommentRepository');
 const ReplyRepository = require('../../../../Domains/replies/ReplyRepository');
+const UserCommentLikeRepository = require('../../../../Domains/user_comment_likes/UserCommentLikeRepository');
 const GetThreadByIdUseCase = require('../GetThreadByIdUseCase');
 const ThreadDetail = require('../../../../Domains/threads/entities/ThreadDetail');
 const Comment = require('../../../../Domains/comments/entities/Comment');
@@ -34,7 +35,11 @@ describe('GetThreadByIdUseCase', () => {
       username: 'comment owner username',
       created_at: 'createdAt',
     });
+
+    const expectedCommentLikesCount = 1;
+
     expectedComment.replies = [expectedReply];
+    expectedComment.likeCount = expectedCommentLikesCount;
 
     expectedThreadDetail.comments = [expectedComment];
 
@@ -42,6 +47,7 @@ describe('GetThreadByIdUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
     const mockUserRepository = new UserRepository();
+    const mockUserCommentLikeRepository = new UserCommentLikeRepository();
 
     mockThreadRepository.getThreadById = jest.fn()
       .mockImplementation(() => Promise.resolve({
@@ -75,12 +81,15 @@ describe('GetThreadByIdUseCase', () => {
       .mockReturnValueOnce('reply owner username')
       .mockReturnValueOnce('comment owner username')
       .mockReturnValueOnce('thread owner username');
+    mockUserCommentLikeRepository.getCommentLikesCount = jest.fn()
+      .mockImplementation(() => Promise.resolve(1));
 
     const getThreadByIdUseCase = new GetThreadByIdUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
       replyRepository: mockReplyRepository,
       userRepository: mockUserRepository,
+      userCommentLikeRepository: mockUserCommentLikeRepository,
     });
 
     const threadDetail = await getThreadByIdUseCase.execute(useCasePayload);
@@ -90,5 +99,6 @@ describe('GetThreadByIdUseCase', () => {
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(useCasePayload.id);
     expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith('comment-123');
     expect(mockUserRepository.getUserUsernameById).toBeCalledTimes(3);
+    expect(mockUserCommentLikeRepository.getCommentLikesCount).toBeCalledWith('comment-123');
   });
 });

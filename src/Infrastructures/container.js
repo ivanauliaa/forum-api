@@ -22,6 +22,9 @@ const CommentRepositoryPostgres = require('./repository/CommentRepositoryPostgre
 const ReplyRepository = require('../Domains/replies/ReplyRepository');
 const ReplyRepositoryPostgres = require('./repository/ReplyRepositoryPostgres');
 
+const UserCommentLikeRepository = require('../Domains/user_comment_likes/UserCommentLikeRepository');
+const UserCommentLikeRepositoryPostgres = require('./repository/UserCommentLikeRepositoryPostgres');
+
 const PasswordHash = require('../Applications/security/PasswordHash');
 const BcryptPasswordHash = require('./security/BcryptPasswordHash');
 
@@ -39,6 +42,8 @@ const AddCommentUseCase = require('../Applications/use_case/comments/AddCommentU
 const DeleteCommentUseCase = require('../Applications/use_case/comments/DeleteCommentUseCase');
 const AddReplyUseCase = require('../Applications/use_case/replies/AddReplyUseCase');
 const DeleteReplyUseCase = require('../Applications/use_case/replies/DeleteReplyUseCase');
+const LikeUnlikeCommentUseCase = require('../Applications/use_case/user_comment_likes/LikeUnlikeCommentUseCase');
+const GetCommentLikesCountUseCase = require('../Applications/use_case/user_comment_likes/GetCommentLikesCountUseCase');
 
 const container = createContainer();
 
@@ -99,6 +104,20 @@ container.register([
   {
     key: ReplyRepository.name,
     Class: ReplyRepositoryPostgres,
+    parameter: {
+      dependencies: [
+        {
+          concrete: pool,
+        },
+        {
+          concrete: nanoid,
+        },
+      ],
+    },
+  },
+  {
+    key: UserCommentLikeRepository.name,
+    Class: UserCommentLikeRepositoryPostgres,
     parameter: {
       dependencies: [
         {
@@ -255,6 +274,10 @@ container.register([
           name: 'userRepository',
           internal: UserRepository.name,
         },
+        {
+          name: 'userCommentLikeRepository',
+          internal: UserCommentLikeRepository.name,
+        },
       ],
     },
   },
@@ -330,6 +353,27 @@ container.register([
         {
           name: 'commentRepository',
           internal: CommentRepository.name,
+        },
+      ],
+    },
+  },
+  {
+    key: LikeUnlikeCommentUseCase.name,
+    Class: LikeUnlikeCommentUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'threadRepository',
+          internal: ThreadRepository.name,
+        },
+        {
+          name: 'commentRepository',
+          internal: CommentRepository.name,
+        },
+        {
+          name: 'userCommentLikeRepository',
+          internal: UserCommentLikeRepository.name,
         },
       ],
     },

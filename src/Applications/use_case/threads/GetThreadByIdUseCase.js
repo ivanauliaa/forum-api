@@ -9,11 +9,13 @@ class GetThreadByIdUseCase {
     commentRepository,
     replyRepository,
     userRepository,
+    userCommentLikeRepository,
   }) {
     this._threadRepository = threadRepository;
     this._commentRepository = commentRepository;
     this._replyRepository = replyRepository;
     this._userRepository = userRepository;
+    this._userCommentLikeRepository = userCommentLikeRepository;
   }
 
   async execute(useCasePayload) {
@@ -42,6 +44,10 @@ class GetThreadByIdUseCase {
         : commentsQuery[i].content;
       commentsQuery[i] = new Comment(commentsQuery[i]);
       commentsQuery[i].replies = repliesQuery;
+
+      const likeCount = await this._userCommentLikeRepository
+        .getCommentLikesCount(commentsQuery[i].id);
+      commentsQuery[i].likeCount = likeCount;
     }
 
     threadQuery.username = await this._userRepository.getUserUsernameById(threadQuery.owner);
