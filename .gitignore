@@ -1,6 +1,7 @@
 .env
 *.pem
 package-lock.json
+config/database/test.json
 
 node_modules/
 coverage/
