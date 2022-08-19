@@ -27,6 +27,7 @@ describe('GetThreadByIdUseCase', () => {
       content: 'a reply',
       username: 'reply owner username',
       created_at: 'createdAt',
+      deleted_at: null,
     });
 
     const expectedComment = new Comment({
@@ -34,6 +35,7 @@ describe('GetThreadByIdUseCase', () => {
       content: 'a comment',
       username: 'comment owner username',
       created_at: 'createdAt',
+      deleted_at: null,
     });
 
     const expectedCommentLikesCount = 1;
@@ -65,6 +67,7 @@ describe('GetThreadByIdUseCase', () => {
           owner: 'user-456',
           created_at: 'createdAt',
           thread_id: 'thread-123',
+          deleted_at: null,
         },
       ]));
     mockReplyRepository.getRepliesByCommentId = jest.fn()
@@ -75,6 +78,7 @@ describe('GetThreadByIdUseCase', () => {
           owner: 'user-789',
           created_at: 'createdAt',
           comment_id: 'comment-123',
+          deleted_at: null,
         },
       ]));
     mockUserRepository.getUserUsernameById = jest.fn()
