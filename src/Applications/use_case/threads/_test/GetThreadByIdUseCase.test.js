@@ -1,6 +1,7 @@
 const ThreadRepository = require('../../../../Domains/threads/ThreadRepository');
 const CommentRepository = require('../../../../Domains/comments/CommentRepository');
 const ReplyRepository = require('../../../../Domains/replies/ReplyRepository');
+const UserCommentLikeRepository = require('../../../../Domains/user_comment_likes/UserCommentLikeRepository');
 const GetThreadByIdUseCase = require('../GetThreadByIdUseCase');
 const ThreadDetail = require('../../../../Domains/threads/entities/ThreadDetail');
 const Comment = require('../../../../Domains/comments/entities/Comment');
@@ -26,6 +27,7 @@ describe('GetThreadByIdUseCase', () => {
       content: 'a reply',
       username: 'reply owner username',
       created_at: 'createdAt',
+      deleted_at: null,
     });
 
     const expectedComment = new Comment({
@@ -33,8 +35,13 @@ describe('GetThreadByIdUseCase', () => {
       content: 'a comment',
       username: 'comment owner username',
       created_at: 'createdAt',
+      deleted_at: null,
     });
+
+    const expectedCommentLikesCount = 1;
+
     expectedComment.replies = [expectedReply];
+    expectedComment.likeCount = expectedCommentLikesCount;
 
     expectedThreadDetail.comments = [expectedComment];
 
@@ -42,6 +49,7 @@ describe('GetThreadByIdUseCase', () => {
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
     const mockUserRepository = new UserRepository();
+    const mockUserCommentLikeRepository = new UserCommentLikeRepository();
 
     mockThreadRepository.getThreadById = jest.fn()
       .mockImplementation(() => Promise.resolve({
@@ -59,6 +67,7 @@ describe('GetThreadByIdUseCase', () => {
           owner: 'user-456',
           created_at: 'createdAt',
           thread_id: 'thread-123',
+          deleted_at: null,
         },
       ]));
     mockReplyRepository.getRepliesByCommentId = jest.fn()
@@ -69,18 +78,22 @@ describe('GetThreadByIdUseCase', () => {
           owner: 'user-789',
           created_at: 'createdAt',
           comment_id: 'comment-123',
+          deleted_at: null,
         },
       ]));
     mockUserRepository.getUserUsernameById = jest.fn()
       .mockReturnValueOnce('reply owner username')
       .mockReturnValueOnce('comment owner username')
       .mockReturnValueOnce('thread owner username');
+    mockUserCommentLikeRepository.getCommentLikesCount = jest.fn()
+      .mockImplementation(() => Promise.resolve(1));
 
     const getThreadByIdUseCase = new GetThreadByIdUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
       replyRepository: mockReplyRepository,
       userRepository: mockUserRepository,
+      userCommentLikeRepository: mockUserCommentLikeRepository,
     });
 
     const threadDetail = await getThreadByIdUseCase.execute(useCasePayload);
@@ -90,5 +103,6 @@ describe('GetThreadByIdUseCase', () => {
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(useCasePayload.id);
     expect(mockReplyRepository.getRepliesByCommentId).toBeCalledWith('comment-123');
     expect(mockUserRepository.getUserUsernameById).toBeCalledTimes(3);
+    expect(mockUserCommentLikeRepository.getCommentLikesCount).toBeCalledWith('comment-123');
   });
 });

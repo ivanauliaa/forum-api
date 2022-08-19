@@ -9,11 +9,13 @@ class GetThreadByIdUseCase {
     commentRepository,
     replyRepository,
     userRepository,
+    userCommentLikeRepository,
   }) {
     this._threadRepository = threadRepository;
     this._commentRepository = commentRepository;
     this._replyRepository = replyRepository;
     this._userRepository = userRepository;
+    this._userCommentLikeRepository = userCommentLikeRepository;
   }
 
   async execute(useCasePayload) {
@@ -29,19 +31,17 @@ class GetThreadByIdUseCase {
       for (let j = 0; j < repliesQuery.length; j += 1) {
         repliesQuery[j].username = await this._userRepository
           .getUserUsernameById(repliesQuery[j].owner);
-        repliesQuery[j].content = repliesQuery[j].deleted_at
-          ? '**balasan telah dihapus**'
-          : repliesQuery[j].content;
         repliesQuery[j] = new Reply(repliesQuery[j]);
       }
 
       commentsQuery[i].username = await this._userRepository
         .getUserUsernameById(commentsQuery[i].owner);
-      commentsQuery[i].content = commentsQuery[i].deleted_at
-        ? '**komentar telah dihapus**'
-        : commentsQuery[i].content;
       commentsQuery[i] = new Comment(commentsQuery[i]);
       commentsQuery[i].replies = repliesQuery;
+
+      const likeCount = await this._userCommentLikeRepository
+        .getCommentLikesCount(commentsQuery[i].id);
+      commentsQuery[i].likeCount = likeCount;
     }
 
     threadQuery.username = await this._userRepository.getUserUsernameById(threadQuery.owner);

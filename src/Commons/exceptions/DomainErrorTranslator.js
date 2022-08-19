@@ -43,6 +43,14 @@ DomainErrorTranslator._directories = {
     new InvariantError('tidak dapat membuat reply karena properti yang dibutuhkan tidak ada'),
   'NEW_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION':
     new InvariantError('tidak dapat membuat reply karena tipe data tidak sesuai'),
+  'LIKE_UNLIKE.NOT_CONTAIN_NEEDED_PROPERTY':
+    new InvariantError('tidak dapat membuat like/unlike payload karena properti yang dibutuhkan tidak ada'),
+  'LIKE_UNLIKE.NOT_MEET_DATA_TYPE_SPECIFICATION':
+    new InvariantError('tidak dapat membuat like/unlike payload karena tipe data tidak sesuai'),
+  'GET_COMMENT_LIKES_COUNT.NOT_CONTAIN_NEEDED_PROPERTY':
+    new InvariantError('tidak dapat membuat get comment likes count payload karena properti yang dibutuhkan tidak ada'),
+  'GET_COMMENT_LIKES_COUNT.NOT_MEET_DATA_TYPE_SPECIFICATION':
+    new InvariantError('tidak dapat membuat get comment likes count payload karena tipe data tidak sesuai'),
 };
 
 module.exports = DomainErrorTranslator;

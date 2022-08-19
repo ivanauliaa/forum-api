@@ -1,25 +1,20 @@
 exports.up = (pgm) => {
-  pgm.createTable('users', {
+  pgm.createTable('user_comment_likes', {
     id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
     },
-    username: {
+    comment_id: {
       type: 'VARCHAR(50)',
       notNull: true,
-      unique: true,
     },
-    password: {
-      type: 'TEXT',
-      notNull: true,
-    },
-    fullname: {
-      type: 'TEXT',
+    user_id: {
+      type: 'VARCHAR(50)',
       notNull: true,
     },
   });
 };
 
 exports.down = (pgm) => {
-  pgm.dropTable('users');
+  pgm.dropTable('user_comment_likes');
 };
